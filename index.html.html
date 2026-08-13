@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIGHT CREW roll CALL 3.0 points</title>
+    <!-- PapaParse CSV-lukija -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        /* TYYLIT (CSS) */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            
+            /* Taustakuva */
+            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+                        url('https://i.ibb.co/GvKVRLcw/milky-way-559641-1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        h1 {
+            margin-bottom: 24px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .osallistuja-lista {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .osallistuja-kortti {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            transition: transform 0.2s, background 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .osallistuja-kortti:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .nimi {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* PISTEET: Valkoinen teksti + tummanharmaa pilleri + vaalea kehys */
+        .pisteet {
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        .ladataan, .virhe {
+            opacity: 0.8;
+            font-style: italic;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>NIGHT CREW roll CALL 3.0 points</h1>
+        <ul id="lista" class="osallistuja-lista">
+            <li class="ladataan">Ladataan tietoja...</li>
+        </ul>
+    </div>
+
+    <script>
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEZxux_x4rjDGfZQjNytxmHSwFeBZBtd2UVAbPxmmIlXsHeR8B_JmnwMjhRwNepvPAb7Lb5McbXQss/pub?output=csv';
+
+        Papa.parse(csvUrl, {
+            download: true,
+            complete: function(results) {
+                const listaElementti = document.getElementById('lista');
+                listaElementti.innerHTML = '';
+
+                const rivit = results.data;
+
+                for (let i = 1; i < rivit.length; i++) {
+                    const rivi = rivit[i];
+                    
+                    if (rivi && rivi[0] && rivi[0].trim() !== '') {
+                        const nimi = rivi[0].trim();
+                        const pisteet = rivi[1] ? rivi[1].trim() : '0';
+
+                        const li = document.createElement('li');
+                        li.className = 'osallistuja-kortti';
+                        li.innerHTML = `
+                            <span class="nimi">${nimi}</span>
+                            <span class="pisteet">${pisteet} ✨</span>
+                        `;
+                        listaElementti.appendChild(li);
+                    }
+                }
+
+                if (listaElementti.children.length === 0) {
+                    listaElementti.innerHTML = '<li class="virhe">Taulukossa ei ole osallistujia.</li>';
+                }
+            },
+            error: function(err) {
+                console.error('Virhe:', err);
+                document.getElementById('lista').innerHTML = '<li class="virhe">Tietojen lataus epäonnistui.</li>';
+            }
+        });
+    </script>
+</body>
+</html>
